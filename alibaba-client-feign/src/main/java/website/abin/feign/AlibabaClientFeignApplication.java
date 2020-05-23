@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,15 +23,27 @@ public class AlibabaClientFeignApplication {
 
         @Autowired
         Client client;
+
         @GetMapping("/test")
         String test(){
 
             return client.hello("hahaha");
         }
     }
+
     @FeignClient(name="nacos-discovery-server")
     interface Client{
         @GetMapping("/hello")
         String hello(@RequestParam String name);
+    }
+
+    @RestController
+    class producer implements Client{
+
+        @GetMapping("/hello")
+        @Override
+        public String hello(@RequestParam("name") String name) {
+            return name;
+        }
     }
 }
